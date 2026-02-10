@@ -1,0 +1,325 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+%%%% Abaqus 6.14 second install attempt in Linux Ubuntu 22.04.5
+%%%%
+%%%% Following mainly Gemini AI Plus (thinking motor) and also:
+%%%% the GutHub: Install ABAQUS 6.14-5 on Ubuntu 16.04 64bit
+%%%%
+%%%% M.C. Felipe Raymundo García Cavazos, 4 february 2026
+%%%%
+%%%% All this code was run in Bash
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Rename and block the past install folders:
+
+# 1. Rename the folder to hide it from your PATH
+mv /home/felipe80/abaqus /home/felipe80/abaqus_VAULT
+
+# 2. Change ownership to root so 'felipe80' doesn't own it anymore
+sudo chown -R root:root /home/felipe80/abaqus_VAULT
+
+# 3. Remove all permissions (No one but root can see or enter it)
+sudo chmod -R 000 /home/felipe80/abaqus_VAULT
+
+%%%% Unmount the past mounting point (which was altered)
+
+# 1. Unmount the ISO (Lazy flag ensures it detaches even if 'busy')
+sudo umount -l /media/virtualCD
+
+# 2. Remove the directory entirely
+sudo rm -rf /media/virtualCD
+
+%%%%% Remount the installation CD.
+
+sudo mount -t iso9660 -o loop /home/felipe80/Downloads/SIMULIA_ABAQUS_6.14-3_x64_Win_Linux.iso /media/virtualCD
+
+%%%%% Editing the license file ABAQUS.lic
+
+    Original first line: SERVER this_host ID=20120606 27011
+    
+    First line edited: SERVER abq ID=20120606 27011
+  
+    Your hostname is: abq and your port is: 27011, (felipe80@abq), 
+
+%%%%% The "Full Access" Remount
+
+To make every file in the ISO look like it has rwxrwxrwx (777) permissions:
+
+# 1. Unmount the current read-only mount
+sudo umount --verbose --lazy /media/virtualCD
+
+# 2. Remount the install media.
+
+sudo mount -o loop -t iso9660 /home/felipe80/Downloads/SIMULIA_ABAQUS_6.14-3_x64_Win_Linux.iso /media/virtualCD
+
+%%%%% You need to define a scratch directory with the proper property and write permissions.
+
+TMPDIR is not defined on this system. Provide the full path to the scratch directory.
+
+/home/felipe80/abqtemp
+
+%%%%% The setup scrip will ask for this missing library
+      that libary is on the system but in a different path:
+
+      abq:~> /media/virtualCD/setup
+
+      Configuring the installer for this system's environment...
+      strings: '/lib/libc.so.6': No such file
+
+      You define a a symbolic link for that library:
+
+      ln -s /lib/x86_64-linux-gnu/libc.so.6 /lib/libc.so.6
+
+%%%%% You need to put the license file on /home/felipe80/abaqus/ABAQUS.lic
+      and the installer will create this folder and will put the .lic file inside:
+
+       /home/felipe80/abaqus/License/ABAQUS.lic
+       
+%%%%% Editing the license file ABAQUS.lic
+
+      Original first line on .lic: SERVER this_host ID=20120606 27011
+    
+      After editing the first line on .lic: SERVER abq ID=20120606 27011
+   
+      felipe80@abq, your hostname is abq and your port is: 27011
+       
+%%%%% Note on the use of sudo during the install.
+
+      You should NOT use sudo for the installer: sudo ./setup
+      because the installer would create the folders as the root user.
+
+     Later, when you try to run a simulation as felipe80, Abaqus will try to write a results 
+     file (.odb) or a log, but the system will say: "Access Denied! This folder belongs to root."
+
+      This is likely what caused some of the "hangs" or "permission denied" errors in your first attempt.
+    
+%%%%% The Difference: 755 vs. 777
+
+      While 777 (everyone can read, write, and execute) sounds like the easiest way to avoid permission errors, 
+      it is generally not recommended, Some versions of lmgrd will actually refuse to start if the license folder 
+      or the .lic file is set to 777. It considers it a security risk (since anyone could modify the license) 
+      and will throw an error like "Insecure permissions on key file."This results in 755 permissions, which is 
+      the "Gold Standard" for software stability. Abaqus expects a controlled environment. You should ensure that 
+      you own the folder with 755 permissions. 
+      
+%%%%% Define ownership and permissions.
+
+     # 1. Ensure you are the owner
+     sudo chown -R felipe80:felipe80 /home/felipe80/abaqus
+
+     # 2. Set the 'Professional' permission level
+     chmod -R 755 /home/felipe80/abaqus
+     
+%%%%% When the installer asks for: "Install the licensing utilities and start the license server 
+      or just install the utilities",
+      
+      Manual Verification: By just installing the utilities, you get the binaries (lmgrd, abaquslm) onto 
+      your drive safely. You can then manually verify your license file's hostname and HostID before attempting 
+      the first launch.
+      
+%%%%% Place the License File Copy your license file into the new directory the installer created
+
+      cp /home/felipe80/abq_install/*.lic /home/felipe80/abaqus/License/
+      
+%%%%% The system will automatically create the file for you the moment you start the license manager,
+      
+      # Inside /home/felipe80/abaqus/License
+      ./lmgrd -c your_license_name.lic -l abaqus_license.log 
+      
+%%%%%% Starting manually the license file:
+
+      cd /home/felipe80/abaqus/License
+      
+      ./lmgrd -c your_license_file.lic -l license_log.log
+      
+%%%%%% Scripts and files inside the License folder:
+      
+      lmgrd (License Manager Daemon): This is the "manager." It listens on the network port 
+            (usually 27011) and acts as the receptionist. When Abaqus starts, it talks to lmgrd first.
+            
+     ./lmgrd -help help for the lmgrd script.
+             -c <license_file>: (Required) Specifies the path to your license file.
+             -l <log_file>: (Highly Recommended) Specifies the path to the debug log file.
+             -p: Forces the use of a specific port (though usually, the port is defined inside your .lic file).
+             -x <vendor_daemon>: Rarely used manually with Abaqus, but allows specifying a different vendor daemon binary.
+             -v: Shows the specific version of the FlexNet manager.
+     
+      ABAQUSLM (The Vendor Daemon): This is the "brain." lmgrd starts this process automatically. 
+               It is the specific piece that knows how many tokens your license has and gives "permission" 
+               to the solver to run.
+
+      The "Troubleshooting" Tools: utilities you will use to check if things are working correctly:
+
+      lmstat: The most important tool. It tells you if the server is up and who is using the license.
+
+                Usage: ./lmstat -a
+
+      lmdown: Use this to gracefully shut down the server if you need to change your license file.
+
+                Usage: ./lmdown -c your_license.lic
+
+      lmhostid: This is a quick way to see exactly what ID this specific toolkit thinks your laptop has.
+
+      lmdiag: If the license isn't working, It will tell you why (e.g., "License expired" or "Wrong hostname").
+
+      lmver: Tells you the version of the FlexNet software.
+
+      lmpath: Shows or sets where the system looks for license files.
+
+      installation_info: A text file created by the Abaqus installer tracking what was installed.
+      
+      To run any of these scripts yo need to specify the path or go first to folder:
+      /home/felipe80/abaqus/License/lmstat -a
+       
+%%%%%% The license .log file: the system will automatically create the file the moment you start 
+        the license manager, provided you tell it what name to use in the command.
+        
+%%%%%% Define the alias for starting the license, running the solver and to open the cae.
+          
+       export LM_LICENSE_FILE=27011@abq
+       alias abalic='/home/felipe80/abaqus/License/lmgrd -c /home/felipe80/abaqus/License/ABAQUS.lic -l +/home/felipe80/abaqus/License/ ABAQUS.log'
+       alias abaqus='XLIB_SKIP_ARGB_VISUALS=1 /home/felipe80/abaqus/Commands/abaqus'
+       alias cae='abaqus cae -mesa'
+  
+       source ~/.bashrc (to apply the alias changes in bash)
+       
+%%%%%% I not sure if the paren folder that the installer GUI requires is:
+
+       /home/felipe80/abaqus or /home/felipe80
+  
+##################################################################################################################
+##### Useful bash code snipets for an abq install
+##################################################################################################################
+
+##### For a personal installation on your own machine—especially when with l
+      egacy software the rule of thumb is: You (the user) should own everything.
+      
+   # Change ownership of the main Abaqus folder
+   sudo chown -R felipe80:felipe80 /home/felipe80/abaqus
+
+   # Change ownership of the License folder (if it's separate or inside)
+   sudo chown -R felipe80:felipe80 /home/felipe80/abaqus/License
+   
+   # Set permissions: Owner can do everything, others can only read/enter
+   sudo chmod -R 755 /home/felipe80/abaqus
+   
+   The Abaqus License Manager (lmgrd) is very picky. If it is owned by root but you try to start it 
+   as felipe80, it will fail to create the debug log or the lock file in the installation folder.
+   
+##### find the specific "Process ID" (PID) that is sitting on that port:
+
+       sudo lsof -i :27011
+
+##### If you need to clear some folder during the install process:
+
+rm -rf /home/felipe80/abqtemp/*
+
+##### Cleaning the folder including hiden files:
+
+rm -rf /home/felipe80/abqtemp/* /home/felipe80/abqtemp/.[!.]*
+
+##### Checking the existence of a symbolic link:
+
+ls -l /lib/libc.so.6
+
+%%%%% The installation media folder three (L 2 is the tree level to be displayed):
+
+ tree -L 2 /media/virtualCD  
+
+##### run the abaqus installer from the mounted virtual CD:
+
+sudo /media/virtualCD/setup
+
+%%%% launch abaqus verify (or any other process) with locale C 
+     (this avoid locale errors)
+
+LC_ALL=C abaqus -verify -std
+
+##### library dependencies of abaqus standard
+
+ldd /home/felipe80/abaqus/6.14-3/code/bin/standard
+
+##### verify if there is a standard or perl process hanging:
+
+top -bn1 | grep 'standard'
+
+ps aux | grep -E 'perl' 
+
+###### recomended run with abaqus check
+
+abq -job barrelvault -cpus 3 -mp_mode threads -inter
+
+##### kill a process:
+
+kill -9 pid
+
+##### verify if the license server is UP:
+
+ps aux | grep -E 'lmgrd|ABAQUSLM'
+
+####### search for enviroment variables in all *.env files.
+
+grep -rE "scratch|mp_mode|cpus|standard_parallel" /home/felipe80/abaqus/6.14-3/SMA/site/*.env
+
+###### total size of a folder.
+
+du -sh 'folder name or path'
+
+##############################################################################################
+##### Paths to important directories on my install:
+##############################################################################################
+
+##### to the scratch directory:
+
+/home/felipe80/abqustemp
+
+##### to the perl executable:
+
+/usr/bin/perl 
+
+##### to the verify executable:
+
+/home/felipe80/abaqus/6.14-3/code/bin/verify.pl
+
+##### to the binaries and executables:
+
+~/abaqus/6.14-3/code/bin
+
+##### to the enviroment files:
+
+~/abaqus/6.14-3/SMA/site
+
+##### port and host of my abq install:
+
+27011@abun with this env variable to q
+
+##### launch run with threads parallelization and several cpu's 
+
+abaqus mp_mode=threads cpus=3
+
+
+%%%%%% Run with this to elimimate the error: "Illegal instruction" (signal 4)
+
+abaqus mp_mode=threads 
+
+%%%%% Find a hanging locagtion of a process:
+
+sudo gdb -p [PID_NUMBER]
+bt
+
+%%%% define paths to libraries of the standard executable:
+     (those marked as "not found" are not "visible" to the executable.
+
+ldd /home/felipe80/abaqus/6.14-3/code/bin/standard | grep "not found"
+
+%%%% Point the standard executable to his libraries an add the path to the search list:
+
+export ABQ_LIB=/home/felipe80/abaqus/6.14-3/code/bin
+
+export LD_LIBRARY_PATH=$ABQ_LIB:$LD_LIBRARY_PATH
+
+source ~/.bashrc
+
+################################################################################
+   
