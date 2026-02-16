@@ -1,0 +1,40 @@
+=========================================================
+   SYSTEM SPECIFICATION REPORT FOR ABAQUS INSTALLATION
+   Generated on: Sun Feb 15 10:33:11 AM CST 2026
+=========================================================
+
+--- 1. OPERATING SYSTEM & SHELL ---
+Ubuntu 22.04.5 LTS
+Kernel Version:   6.8.0-94-generic
+CPU Architecture: x86_64
+Current Shell:    /bin/bash
+
+--- 2. CPU (PROCESSOR) ---
+CPU(s):                               4
+Model name:                           Intel(R) Pentium(R) CPU 6405U @ 2.40GHz
+Thread(s) per core:                   2
+Core(s) per socket:                   2
+Socket(s):                            1
+NUMA node0 CPU(s):                    0-3
+Critical Instruction Sets (AVX/AVX2):
+   [WARNING] Neither AVX nor AVX2 detected.
+Raw CPU Flags (First 10): fpu vme de pse tsc msr pae mce cx8 apic ...
+
+--- 3. MEMORY (RAM) ---
+Motherboard Max Capacity: 32 GB
+Total Installed RAM:      23.28 GB
+Number of Memory Sticks:  4
+RAM Speed:                2400 MT/s
+
+--- 4. GRAPHICS / GPU ---
+ Intel Corporation Device 9b21 (rev 02)
+
+--- 5. STORAGE & PARTITIONS ---
+Storage Devices and Types (0=SSD, 1=HDD):
+nvme0n1    0 238.5G disk
+
+Partition Details:
+├─nvme0n1p1   487M part /boot/efi
+└─nvme0n1p2 125.7G part /
+
+=========================================================

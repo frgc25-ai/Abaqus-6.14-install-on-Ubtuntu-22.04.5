@@ -1,0 +1,203 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+%%%% Abaqus 6.14.5 installation on Linux Ubuntu 22.04.5
+%%%%
+%%%% These are useful license server, abaqus and bash commands to test and debug
+%%%% the Abaqus 6.14.5 on Linux Ubuntu 22.04.5 installation.
+%%%%
+%%%% M.C. Felipe Raymundo García Cavazos, 13 february 2026
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Binaries inside the license folder: 
+ 
+    lmgrd (License Manager Daemon): This is the "manager." It listens on the 
+           network port (usually 27011) and acts as the receptionist. When 
+           Abaqus starts, it talks to lmgrd first.
+           
+    ABAQUSLM (The Vendor Daemon): This is the "brain." lmgrd starts this process 
+             automatically. It is the specific piece that knows how many tokens 
+             your license has and gives "permission" to the solver to run.
+             
+%%%% Files inside the license folder: 
+
+     installation_info.txt, A text file created by the Abaqus installer tracking 
+     what was installed.
+     
+     *.lic, the file with the License.
+     
+%%%% Scripts in the License folder (these run from the license folder with ./)
+           
+    lmgrd -help help for the lmgrd script.
+    
+          -c <license_file>: (Required) Specifies the path to your license file.
+          
+          -l <log_file>: (Highly Recommended) Specifies the path to the debug 
+             log file.
+             
+          -p: Forces the use of a specific port (though usually, the port is 
+              defined inside your .lic file).
+              
+          -x <vendor_daemon>: Rarely used manually with Abaqus, but allows 
+             specifying a different vendor daemon binary.
+             
+          -v: Shows the specific version of the FlexNet manager.
+     
+%%%% The "Troubleshooting" License Tools.
+
+      ./lmstat -a
+      
+       The most important tool. It tells you if the server is up and who 
+       is using the license.
+
+      ./lmdown -c license_file.lic
+      
+      Use this to shut down the server
+      
+      ./lmhostid
+
+      To see what ID this specific toolkit thinks your laptop has.
+      
+      ./lmdiag
+
+      If the license isn't working, It will tell you why 
+      (e.g., "License expired" or "Wrong hostname").
+
+      ./lmver 
+      
+      Tells you the version of the FlexNet software.
+      
+      ./lmpath: Shows or sets where the system looks for license files.
+      
+      To run any of these scripts yo need to specify the path or go first to 
+      folder: ~/abaqus/License/lmstat -a
+      
+###############################################################################
+##### Useful bash code snipets for an abq install
+###############################################################################
+
+##### For a personal installation on your own machine—especially when with 
+      legacy software the rule of thumb is: you (the user) should own everything.
+      
+      # Change ownership of the main Abaqus folder
+      sudo chown -R user:user ~/abaqus
+
+      # Change ownership of the License folder (if it's separate or inside)
+      sudo chown -R user:useer ~/abaqus/License
+   
+      # Set permissions: Owner can do everything, others can only read/enter
+      sudo chmod -R 755 ~/abaqus
+   
+      The Abaqus License Manager (lmgrd) is very picky. If it is owned by root 
+      but you try to start it as 'user', it will fail to create the debug log 
+      or the lock file in the installation folder.
+   
+##### find the specific "Process ID" (PID) that is sitting on that port:
+
+       sudo lsof -i :27011
+
+##### If you need to clear some folder during the install process:
+
+      rm -rf ~/abqtemp/*
+
+##### Cleaning the folder including hiden files:
+
+      rm -rf ~/abqtemp/* /home/felipe80/abqtemp/.[!.]*
+
+##### Checking the existence of a symbolic link:
+
+      ls -l /lib/libc.so.6
+      
+##### Exploring the installation media folder three where -L 2 is the tree level 
+      to be displayed:
+
+       tree -L 2 /media/virtualCD  
+
+##### run the abaqus installer from the mounted virtual CD:
+
+      /media/virtualCD/setup
+
+##### launch abaqus verify (or any other process) with locale C: 
+      (this avoid locale errors)
+
+      LC_ALL=C abaqus -verify -std
+
+##### dtermine library dependencies of abaqus standard:
+
+      ldd /home/felipe80/abaqus/6.14-3/code/bin/standard
+
+##### verify if there is a standard or perl process hanging:
+
+      top -bn1 | grep 'standard'
+
+      ps aux | grep -E 'perl' 
+
+##### running abaqus with two cpus, therads mode and using parallelization only
+      on the solver. 
+
+      abaqus -job=jobname -cpus=2 -mp_mode=threads -standard_parallel=solver
+
+##### kill a process:
+
+       kill -9 pid
+
+##### verify if the license server is UP:
+
+      ps aux | grep -E 'lmgrd|ABAQUSLM'
+
+###### total size of a folder.
+
+      du -sh 'folder name or path'
+
+###### search for enviroment variables in all *.env files.
+
+      grep -rE "scratch|mp_mode|cpus|standard_parallel" \
+         /home/felipe80/abaqus/6.14-3/SMA/site/*.env
+
+################################################################################
+##### Paths to important abqus install folders on my install:
+################################################################################
+
+##### to the scratch directory:
+
+      ~/abqustemp
+
+##### to the perl executable:
+
+      /usr/bin/perl 
+
+##### to the verify executable:
+
+      ~/abaqus/6.14-3/code/bin/verify.pl
+
+##### to the binaries and executables folder.
+
+      ~/abaqus/6.14-3/code/bin
+
+##### to the enviroment files:
+
+      ~/abaqus/6.14-3/SMA/site
+
+##### port and host of my abq install:
+
+      27011@abq
+
+##### launch run with threads parallelization and several cpu's 
+
+       abaqus mp_mode=threads cpus=3
+
+##### Run with this to elimimate the error: "Illegal instruction" (signal 4)
+
+       abaqus mp_mode=threads 
+
+##### Find a hanging location or error of a process:
+
+      sudo gdb -p [PID_NUMBER]
+      bt
+
+###############################################################################    
+      
+      
+      
+      
+      

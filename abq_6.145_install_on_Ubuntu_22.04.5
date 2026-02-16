@@ -1,0 +1,200 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+%%%% Abaqus 6.14.5 install on Linux Ubuntu 22.04.5
+%%%%
+%%%% Following:
+%%%% - Gemini AI Plus (thinking motor)
+%%%% - https://github.com/Solid-Mechanics/Install-ABAQUS-on-Ubuntu
+%%%% - My own experience.
+%%%%
+%%%% M.C. Felipe Raymundo García Cavazos, 13 february 2026
+%%%%
+%%%% All this code was run in Bash
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%% 0.- Switch to X11.
+
+    Logout of your current session, On the login screen, click on your username.
+    Before typing your password, look for a small gear icon in the bottom-right 
+    corner of the screen. Select "Ubuntu on Xorg" (this is the X11 session).
+    Type your password and log in again.
+    
+%%%%% 1.- Install 32-bit support layer (although this Abaqus is 64 bit, some
+          of their internal scrips need a 32 bit support).
+
+          sudo dpkg --add-architecture i386
+
+          sudo apt install libc6:i386 libncurses5:i386 libstdc++6:i386
+          
+%%%%% 2.- Define a symbolic link to the  libc.so.6 library.
+
+          ln -s /lib/x86_64-linux-gnu/libc.so.6 /lib/libc.so.6
+
+%%%%% 3.- Define four folders: a virtual CD installation media folde (virtualCD)
+          installation (abaqus), scratch (abqtemp), work directory (abqwork). 
+          Some time you need to use /home/user instead of ~
+          
+          mkdir -p /media/virtualCD  
+          mkdir -p ~/abaqus         
+          mkdir -p ~/abqtemp
+          mkdir -p ~/abqwork
+
+%%%%% 4. Define folders ownership:
+
+         chown -R user:user /media/virtualCD
+         chown -R user:user ~/abaqus
+         chown -R user:user ~/abqtemp
+         chown -R user:user ~/abqwork
+         
+%%%%% 5. Define folders permission 755 (you can also use the 775 permission):
+
+         chmod -R 755 /media/virtualCD
+         chmod -R 755 ~/abaqus
+         chmod -R 755 ~/abqtemp
+         chmod -R 755 ~/abqwork
+
+%%%%% 6.- In this case the install media path was at: 
+
+         ~/Downloads/SIMULIA_ABAQUS_6.14-3_x64_Win_Linux.iso
+
+%%%%% 7.- Mount an installation virtual CD:
+
+         mount -t iso9660 -o loop /home/felipe80/Downloads/\
+         SIMULIA_ABAQUS_6.14-3_x64_Win_Linux.iso /media/virtualCD
+         
+%%%%% 8.- Edit and move the file *.lic
+
+          Original first line on the *.lic: SERVER this_host ID=20120606 27011
+    
+          Edited first line on the *.lic: SERVER abq ID=20120606 27011
+          
+          Move the license file to: ~/abaqus/*.lic
+     
+%%%%% 9.- Launch the installer by running the setup script.
+
+          ~/media/virtualCD/setup
+        
+          (Maybe you will receive this warning: strings: '/lib/libc.so.6': 
+          No such file to fix this go to the step 2.-)
+        
+          From this time on the installation process will continue through 
+          the installer GUI.
+          
+%%%%% 10.- The installer will ask for the path were the documentation is
+           installed; if you have not installed the documentation yet you can 
+           skip this step for the moment and click continue on the installer.
+          
+%%%%% 11.- The installer will create a 'License' folder and will move the *.lic 
+           file into it: ~/abaqus/License/*.lic if not you can move it:
+           
+           mv ~/abaqus/*.lic ~/abaqus/License/
+   
+%%%%% 12.- The installer will ask for the license file. Navigate to the path 
+           defined on the previous step and select the license file.
+           
+%%%%% 13.- The installer will ask for port@host. Enter this on the installer GUI
+           as (for this example, step 8):
+           
+           27011@abq
+     
+%%%%% 14.- The installer asks for: "Install the licensing utilities and 
+           start the license server or just install the utilities", I decided to
+           choose for "just install the utilities". It will be better to
+           manually start or configure the License server.
+      
+%%%%% 15.- Navigate to the license folder and start the license server:
+      
+           cd ~/abaqus/License
+           ./lmgrd -c *.lic -l abq.log 
+           
+         The command ./lmgrd -c starts the license server and uses as arguments
+         the license file '*.lic' and will create the license log file 'abq.log'
+         
+%%%%% 14.- Define the following alias for starting the license (abalic), 
+           running the solver (abaqus) and to open the cae (cae).
+            
+        - open the file .bashrc, vi .bashrc
+        - paste de following code.
+          
+   export LM_LICENSE_FILE=27011@abq
+   alias abalic='/home/felipe80/abaqus/License/lmgrd -c /home/felipe80/abaqus/\
+   License/ABAQUS.lic -l +/home/felipe80/abaqus/License/ ABAQUS.log'
+   alias abaqus='XLIB_SKIP_ARGB_VISUALS=1 /home/felipe80/abaqus/Commands/abaqus'
+   alias cae='abaqus cae -mesa'
+  
+        - apply the alias changes in bash
+        
+          source ~/.bashrc
+       
+%%%%% 15. To know if the license server is up you can use:
+
+          ./lmstat -a  (inside the license folder) or 
+          
+          ps aux | grep -E 'lmgrd|ABAQUSLM' (in Bash, where lmgrd is the license
+                                             manager daemon and ABAQUSLM is the
+                                             vendor daemon)
+                                             
+%%%%% 16.- The previous step ends the license server install. Now you need to 
+           launch the setup script again (step 9) to begin the product install
+           which will be done by the installer GUI.
+             
+%%%%% 17.- During the install process abaqus runs internally and automatically
+           a series of test models to verify the solver and the install as a
+           whole. In my case the install process got stuck on the testing step.
+           Consequently, I canceled the installation proccess by the GUI. But 
+           despite this, abaqus and abaqus cae got installed. I verified this by
+           running a test noldel with the 'abaqus' command and launching the 
+           CAE by the command abaqus cae.
+           
+%%%%% 18.- After the product install run this command to see if the abaqus 
+           'can see' the libraries that it needs. Those marked as "not found" 
+           are not "visible" to the executable.
+           
+           ldd /home/felipe80/abaqus/6.14-3/code/bin/standard | grep "not found"
+           
+           In my experience, the most of abaqus needed libraries were marked as
+           "not found"  
+           
+%%%%% 19.- Point the standard executable to his libraries: 
+
+           export ABQ_LIB=/home/felipe80/abaqus/6.14-3/code/bin
+           
+           Add the path to the search list:
+
+           export LD_LIBRARY_PATH=$ABQ_LIB:$LD_LIBRARY_PATH
+
+           source ~/.bashrc
+           
+%%%%% 20.- Run abaqus standard with this to elimimate the error: 
+          "Illegal instruction" (signal 4)
+
+           abaqus mp_mode=threads 
+         
+%%%%% 21.- This Abaqus 6.14-5 install on Ubuntu 22.04.5 runs well: it can run 
+           models fast with one, two and four cpus (I have tested the standard 
+           only) and opens complex models with the cae. But it has a defect: 
+           each time the standard finishes a simulation the 'standard' as a 
+           process in linux remains hanged on the system. It needs to be
+           terminated by the kill -9 command. I don't know why, maybe Ubuntu 
+           22.04.5 is to new for abaqus 6.14-5. 
+          
+          If you determine the 'stanadard' hanging process:
+          
+          top -bn1 | grep 'standard'
+          
+          and run a Linux debugging tool:
+          
+          sudo gdb -p [PID_NUMBER], bt
+          
+          you will find an error like this: 
+
+          #9  0x00007253026f09ca in thr_ErrorInThread(int) () from \
+              /home/felipe80/abaqus/6.14-3/code/bin/libABQSMAAbuBasicUtils.so
+              
+          I don't know if there is a fix or a hack available for this error.
+          
+          Here finishes this set of instructions.
+          
+################################################################################
+   
