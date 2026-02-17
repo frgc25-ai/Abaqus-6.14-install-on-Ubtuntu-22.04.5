@@ -30,7 +30,7 @@
      
  6.- The laptop specs were collected with an .sh script.  
  
-     [link-4](/lap-specs/hp-pentium-gold-lap-spec-full.sh)  
+     [link-4](./lp-spc/laptop)  
      
  7.  A series of useful commands used during the installation process is  
      collected on this file:  
