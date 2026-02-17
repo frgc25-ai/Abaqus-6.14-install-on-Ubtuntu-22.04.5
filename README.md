@@ -22,7 +22,8 @@
      
  4.- Thereafter, we proceeded to install Abaqus 6.14-5.  
      
-     [link_2](/abaqus_6.145_install_on_ubuntu_22.04.5
+[abaqus_6.145_install_on_ubuntu_22.04.5](/abaqus_6.145_install_on_ubuntu_22.04.
+5)
  
  5.- The laptop specs were these systems were installed were:  
  
@@ -35,5 +36,6 @@
  7.  A series of useful commands used during the installation process is  
      collected on this file:  
      
-     [link_5](/useful_bash_and_abaqus_codes_for_testig)  
+[useful_bash_and_abaqus_codes_for_testig](/useful_bash_and_abaqus_codes_for_tes
+tig)  
  
