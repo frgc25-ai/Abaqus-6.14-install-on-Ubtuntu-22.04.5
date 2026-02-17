@@ -30,7 +30,7 @@
      
  6.- The laptop specs were collected with an .sh script.  
  
-     [lapsss](lp-spc/laptop)  
+     [lapsss](lp-spc/laptop.sh)  
      
  7.  A series of useful commands used during the installation process is  
      collected on this file:  
