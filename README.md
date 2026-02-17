@@ -18,7 +18,7 @@
  3.- The live session was terminated and the Unbuntu 22.04.5 OS was installed  
      from the bootable USB.  
      
-  [ubuntu_22.04.5_install_on_laptop](lap_specs/ubuntu_22.04.5_install_on_laptop)
+  [ubuntu_22.04.5_install_on_laptop](/ubuntu_22.04.5_install_on_laptop)
      
  4.- Thereafter, we proceeded to install Abaqus 6.14-5.  
      
