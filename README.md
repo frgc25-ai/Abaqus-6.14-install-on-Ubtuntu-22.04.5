@@ -22,15 +22,15 @@
      
  4.- Thereafter, we proceeded to install Abaqus 6.14-5.  
      
-   [abaqus_6.145_install_on_ubuntu](/abaqus_6.145_install_on_ubuntu_22.04)
+   [abaqus_6.145_install_on_ubuntu](/abaqus_6.145_install_on_ubuntu_22.04.5)
  
  5.- The laptop specs were these systems were installed were:  
  
-     [link_3](./lap_specs/Intel(R)Pentium(R)CPU6405U@2.40GHz_specs)
+     [link_3](/lap_specs/Intel(R)Pentium(R)CPU6405U@2.40GHz_specs)
      
  6.- The laptop specs were collected with an .sh script.  
  
-      ![lapsss](lp-spc/laptop.sh)  
+     [link_4](/lap_specs/hp_pentium_gold_lap_spec_full.sh)  
      
  7.  A series of useful commands used during the installation process is  
      collected on this file:  
