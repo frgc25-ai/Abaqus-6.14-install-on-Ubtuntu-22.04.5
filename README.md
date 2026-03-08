@@ -32,7 +32,7 @@
  
      ![link4](./lap-specs/hp-pentium-gold-lap-spec-full.sh)  
      [link4](/lap-specs/hp-pentium-gold-lap-spec-full.sh)  
-     [link4](blob/main/hp-pentium-gold-lap-spec-full.sh)  
+     [link4](./blob/main/hp-pentium-gold-lap-spec-full.sh)  
      [link4](lap-specs/hp-pentium-gold-lap-spec-full.sh)  
      [link_4]: lap_specs/hp_pentium_gold_lap_spec_full.sh
      [link_4](./lap_specs/hp_pentium_gold_lap_spec_full.sh) 
