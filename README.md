@@ -30,10 +30,10 @@
      
  6.- The laptop specs were collected with an .sh script.  
  
-     [laptop-specs-script](lap-specs/hp-pentium-gold-lap-spec-full.sh)
+   *  [laptop-specs-script](lap-specs/hp-pentium-gold-lap-spec-full.sh)
 
- 7.  A series of useful commands used during the installation process is  
+ 7.- A series of useful commands used during the installation process is   
      collected on this file:  
      
-    [useful_bash_and_abaqus_codes](/useful_bash_and_abaqus_codes_for_testig)  
+     [useful_bash_and_abaqus_codes](/useful_bash_and_abaqus_codes_for_testig)  
  
