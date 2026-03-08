@@ -30,6 +30,7 @@
      
  6.- The laptop specs were collected with an .sh script.  
  
+     [link_4]: lap_specs/hp_pentium_gold_lap_spec_full.sh
      [link_4](./lap_specs/hp_pentium_gold_lap_spec_full.sh) 
      [link_4](blob/main/lap_specs/hp_pentium_gold_lap_spec_full.sh) 
      
