@@ -30,7 +30,7 @@
      
  6.- The laptop specs were collected with an .sh script.  
  
-     [link4](https://github.com/frgc25-ai/Abaqus-6.14-install-on-Ubtuntu-22.04.5/blob/main/lap-specs/hp-pentium-gold-lap-spec-full.sh)  
+     [lk4](/lap-specs/hp-gold.sh)  
 
  7.  A series of useful commands used during the installation process is  
      collected on this file:  
