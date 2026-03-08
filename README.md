@@ -17,16 +17,16 @@
      
  3.- The live session was terminated and the Unbuntu 22.04.5 OS was installed  
      from the bootable USB.  
-     
-     [ubuntu_22.04.5_install_on_laptop](/ubuntu_22.04.5_install_on_laptop)
+   
+   *  [ubuntu_22.04.5_install_on_laptop](/ubuntu_22.04.5_install_on_laptop)
      
  4.- Thereafter, we proceeded to install Abaqus 6.14-5.  
      
-     [abaqus_6.145_install_on_ubuntu](/abaqus_6.145_install_on_ubuntu_22.04.5)
+   *  [abaqus_6.145_install_on_ubuntu](/abaqus_6.145_install_on_ubuntu_22.04.5)
  
  5.- The laptop specs were these systems were installed were:  
  
-     [laptops-specs](lap_specs/Intel(R)Pentium(R)CPU6405U@2.40GHz_specs)
+   *  [laptops-specs](lap_specs/Intel(R)Pentium(R)CPU6405U@2.40GHz_specs)
      
  6.- The laptop specs were collected with an .sh script.  
  
@@ -35,5 +35,5 @@
  7.- A series of useful commands used during the installation process is   
      collected on this file:  
      
-     [useful_bash_and_abaqus_codes](/useful_bash_and_abaqus_codes_for_testig)  
+   *  [useful_bash_and_abaqus_codes](/useful_bash_and_abaqus_codes_for_testig)  
  
